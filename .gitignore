@@ -1,0 +1,7 @@
+/.cache
+**/elpa
+++/elpaca
+recentf
+**/eshell
+**/url
+**/transient
