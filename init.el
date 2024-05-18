@@ -2,7 +2,7 @@
 
 					; (elpaca-wait)
 ;; A recipe for sly quicklisp a sly 'contrib' via Elpaca, not sure if this will work, going to try it.
-(:package "sly-quicklisp" :source nil :protocol https :inherit t :depth 1 :fetcher github :repo "joaotavora/sly-quicklisp" :files (:defaults "*.lisp" "*.asd"))
+;(:package "sly-quicklisp" :source nil :protocol https :inherit t :depth 1 :fetcher github :repo "joaotavora/sly-quicklisp" :files (:defaults "*.lisp" "*.asd"))
 
 ;; Load custom file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -43,14 +43,15 @@
 ;; Fix known issue with MELPA
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
-					;(electric-pair-mode)
-					;(setq electric-pair-pairs '(
-					;			   (?\{ . ?\})
-					;			   (?\[ . ?\])
-					;			   (?\" . ?\")
-					;			   (?\< . ?\>)
+;; In place of smartparens and pairedit
+(electric-pair-mode)
+(setq electric-pair-pairs '(
+			   (?\{ . ?\})
+			   (?\[ . ?\])
+			   (?\" . ?\")
+			   (?\< . ?\>)
 
-					;))
+					))
 
 
 ;; themes
@@ -121,6 +122,29 @@
 (use-package vterm
   :commands vterm)
 
+;;Fontaine
+(use-package fontaine
+    :ensure t
+    :config
+    (setopt fontaine-presets
+            '((regular
+               :default-height 140)
+              (small
+               :default-height 110)
+              (large
+               :default-weight semilight
+               :default-height 180
+               :bold-weight extrabold)
+              (extra-large
+               :default-weight semilight
+               :default-height 210
+               :line-spacing 5
+               :bold-weight ultrabold)
+              (t                        ; our shared fallback properties
+               :default-family "PragmataPro Mono Liga")))
+
+
+    
 ;; Sly (Common Lisp)
 (use-package sly
   :ensure t
@@ -130,6 +154,24 @@
         '((sbcl ("sbcl" "--dynamic-space-size" "8192"))
           ;; Add other Lisp implementations here if needed
           )))
+
+;; Alternative setup for sly using roswell, needs modification
+;; (use-package sly
+;;   :ensure t
+;;   :commands (sly sly-connect)
+;;   :init
+;;   (setq sly-symbol-completion-mode nil
+;;         sly-default-lisp 'roswell
+;;         ros-config (locate-user-emacs-file
+;;                     "ros-conf.lisp")
+;;         sly-lisp-implementations
+;;         `((sbcl ("sbcl") :coding-system utf-8-unix)
+;;           (abcl ("abcl") :coding-system utf-8-unix)
+;;           (ecl ("ecl") :coding-system utf-8-unix)
+;;           (roswell ("ros" "-Q" "-l" ,ros-config "run"))
+;;           (qlot ("qlot" "exec" "ros" "-l" ,ros-config "run" "-S" ".")
+;;                 :coding-system utf-8-unix))))
+
 
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
