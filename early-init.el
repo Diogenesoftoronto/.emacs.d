@@ -43,6 +43,10 @@
 ;; See the "recipes" section of the manual for more details.
 
 ;; (elpaca example-package)
+;; Install use-package support
+(elpaca elpaca-use-package
+  ;; Enable use-package :ensure support for Elpaca.
+  (elpaca-use-package-mode))
 
 
 

@@ -1,104 +1,107 @@
-
-
-					; (elpaca-wait)
-;; A recipe for sly quicklisp a sly 'contrib' via Elpaca, not sure if this will work, going to try it.
-;(:package "sly-quicklisp" :source nil :protocol https :inherit t :depth 1 :fetcher github :repo "joaotavora/sly-quicklisp" :files (:defaults "*.lisp" "*.asd"))
-
 ;; Load custom file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror)
 
 ;; Load other configuration files
-					;(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-;; These do not yet exist, but this is the structure to look forward once,
-;; I want to split my config up more!
-					;(load "init-packages")
-					;(load "init-ui")
-					;(load "init-editing")
-					;(load "init-programming")
-					;(load "init-org")
-					;(load "init-keybindings")
+;; These do not yet exist, but this is the structure to look forward to once I want to split my config up more!
+;; (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+;; (load "init-packages")
+;; (load "init-ui")
+;; (load "init-editing")
+;; (load "init-programming")
+;; (load "init-org")
+;; (load "init-keybindings")
 
+;; Fix known issue with MELPA
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
 ;; Initialize package sources
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
-;; Install use-package support
-(elpaca elpaca-use-package
-  ;; Enable use-package :ensure support for Elpaca.
-  (elpaca-use-package-mode))
 ;; Dashboard for emacs
 (use-package dashboard
-  :ensure
+  :ensure t
   :config
   (add-hook 'elpaca-after-init-hook #'dashboard-insert-startupify-lists)
   (add-hook 'elpaca-after-init-hook #'dashboard-initialize)
   (dashboard-setup-startup-hook))
 
-;; Enable visual bell instead of sound
-(setq visible-bell t)
+;; Automatic code formatting
+(use-package apheleia
+  :ensure t
+  :config
+  (apheleia-global-mode 1)
+  ;; Setup auto formatting for purescript
+  (push '(purs-tidy "purs-tidy" "format") apheleia-formatters)
+  (setf (alist-get 'purescript-mode apheleia-mode-alist) '(purs-tidy))
+  ;; Setup auto formatting for haskell
+  (push '(fourmolu "fourmolu") apheleia-formatters)
+  (setf (alist-get 'haskell-mode apheleia-mode-alist) '(fourmolu)))
 
-;; Fix known issue with MELPA
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+;; Display hex colors in emacs
+(use-package rainbow-mode
+  :ensure t
+  :commands (rainbow-mode))
 
-;; In place of smartparens and pairedit
-(electric-pair-mode)
-(setq electric-pair-pairs '(
-			   (?\{ . ?\})
-			   (?\[ . ?\])
-			   (?\" . ?\")
-			   (?\< . ?\>)
+;; Themes
+(use-package material-theme
+  :ensure t
+  :init
+  (load-theme 'material t))
 
-					))
+(use-package pulse
+  ;; Highlight cursor position after movement
+  :defer t
+  :init (defun pulse-line (&rest _)
+          (pulse-momentary-highlight-one-line (point)))
+  (dolist (command '(other-window
+                     windmove-do-window-select
+                     mouse-set-point
+                     mouse-select-window))
+    (advice-add command :after #'pulse-line)))
 
-
-;; themes
-(use-package ayu-theme
-  :init (load-theme 'ayu-dark t))
-
-					;(use-package catppuccin-theme
-					;  :defer t)
-
-; Makes sure that the spinner dependency is available
+;; Makes sure that the spinner dependency is available
 (use-package spinner :ensure t)
 
 ;; LSP Mode
-(use-package lsp-mode
-  :commands lsp
-  :hook (prog-mode . lsp)
-  :custom
-  (lsp-keymap-prefix "s-l")
-  :config
-  (use-package lsp-ui :commands lsp-ui-mode)
-  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-  (use-package lsp-treemacs
-    :config
-    (lsp-treemacs-sync-mode 1)))
+;; (use-package lsp-mode
+;;   :commands lsp
+;;   :hook (prog-mode . lsp)
+;;   :custom
+;;   (lsp-keymap-prefix "s-l")
+;;   :config
+;;   (use-package lsp-ui :commands lsp-ui-mode)
+;;   (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;;   (use-package lsp-treemacs
+;;     :config
+;;     (lsp-treemacs-sync-mode 1)))
 
-;; Company Mode!
+;; Company Mode
 (use-package company
-  :hook (after-init . global-company-mode))
+  :ensure t
+  :init (global-company-mode))
 
 ;; Flycheck
 (use-package flycheck
-  :hook (after-init . global-flycheck-mode))
+  :ensure t
+  :init (global-flycheck-mode))
 
 ;; DAP Mode
-(use-package dap-mode
-  :commands dap-debug
-  :config
-  (dap-mode 1)
-  (dap-ui-mode 1)
-  (dap-tooltip-mode 1)
-  (require 'dap-lldb)
-  (dap-register-debug-template "Rust::LLDB"
-			       (list :type "lldb"
-				     :request "launch"
-				     :name "LLDB::Run"
-				     :program "${workspaceFolder}/target/debug/your_program"
-				     :cwd "${workspaceFolder}")))
+;; (use-package dap-mode
+;;   :commands dap-debug
+;;   :config
+;;   (dap-mode 1)
+;;   (dap-ui-mode 1)
+;;   (dap-tooltip-mode 1)
+;;   (require 'dap-lldb)
+;;   (dap-register-debug-template "Rust::LLDB"
+;;                                (list :type "lldb"
+;;                                      :request "launch"
+;;                                      :name "LLDB::Run"
+;;                                      :program "${workspaceFolder}/target/debug/your_program"
+;;                                      :cwd "${workspaceFolder}")))
 
 ;; Treemacs
 (use-package treemacs
@@ -111,66 +114,86 @@
   (treemacs-follow-mode 1)
   (treemacs-filewatch-mode 1))
 
-
 ;; Helm
 (use-package helm
+  :ensure t
   :init (helm-mode 1))
 
 (use-package helm-lsp
-  :commands helm-lsp-workspace-symbol)
-; VTerm
+  :ensure t)
+
+;; VTerm
 (use-package vterm
+  :ensure t
   :commands vterm)
 
-;;Fontaine
-(use-package fontaine
-    :ensure t
-    :config
-    (setopt fontaine-presets
-            '((regular
-               :default-height 140)
-              (small
-               :default-height 110)
-              (large
-               :default-weight semilight
-               :default-height 180
-               :bold-weight extrabold)
-              (extra-large
-               :default-weight semilight
-               :default-height 210
-               :line-spacing 5
-               :bold-weight ultrabold)
-              (t                        ; our shared fallback properties
-               :default-family "PragmataPro Mono Liga")))
+;; ;; Fontaine
+;; (use-package fontaine
+;;   :ensure t
+;;   :config
+;;   (setopt fontaine-presets
+;;           '((regular :default-height 140)
+;;             (small :default-height 110)
+;;             (large :default-weight semilight :default-height 180 :bold-weight extrabold)
+;;             (extra-large :default-weight semilight :default-height 210 :line-spacing 5 :bold-weight ultrabold)
+;;             (t :default-family "PragmataPro Mono Liga"))))
 
+(setq inferior-lisp-program "/usr/bin/sbcl")
 
-    
-;; Sly (Common Lisp)
+;; Ensure global syntax highlighting
+(global-font-lock-mode)
+
+;; Use sly for Common Lisp interaction
+;; The hooks do not seem to be doing much of anything will have to figure that out later
 (use-package sly
   :ensure t
+  :hook ((lisp-mode . sly-mode))
   :config
-  ;; Set the Lisp implementation and dynamic space size for SBCL
   (setq sly-lisp-implementations
-        '((sbcl ("sbcl" "--dynamic-space-size" "8192"))
-          ;; Add other Lisp implementations here if needed
-          )))
+        '((sbcl ("sbcl" "--dynamic-space-size" "8192"))))
+  
+  )
 
-;; Alternative setup for sly using roswell, needs modification
-;; (use-package sly
+					;(electric-pair-mode)
+					;(setq electric-pair-pairs '(
+					;			    (?\{ . ?\})
+					;			    (?\[ . ?\])
+					;			    (?\" . ?\")
+					;			    (?\< . ?\>)
+					;			    ))
+
+;; Enable Rainbow Delimiters for color-coding nested parentheses
+(use-package rainbow-delimiters
+  :ensure t
+  :hook ((lisp-mode . rainbow-delimiters-mode)
+	 (emacs-lisp-mode . rainbow-delimiters-mode))
+  :config
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "#c66")
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "#6c6")
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "#69f")
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "#cc6")
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "#6cc")
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "#c6c")
+  (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")
+  (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")
+  (set-face-foreground 'rainbow-delimiters-depth-9-face "#666"))
+
+;; (use-package helm-company
 ;;   :ensure t
-;;   :commands (sly sly-connect)
-;;   :init
-;;   (setq sly-symbol-completion-mode nil
-;;         sly-default-lisp 'roswell
-;;         ros-config (locate-user-emacs-file
-;;                     "ros-conf.lisp")
-;;         sly-lisp-implementations
-;;         `((sbcl ("sbcl") :coding-system utf-8-unix)
-;;           (abcl ("abcl") :coding-system utf-8-unix)
-;;           (ecl ("ecl") :coding-system utf-8-unix)
-;;           (roswell ("ros" "-Q" "-l" ,ros-config "run"))
-;;           (qlot ("qlot" "exec" "ros" "-l" ,ros-config "run" "-S" ".")
-;;                 :coding-system utf-8-unix))))
+;;   :config
+;;   (define-key company-active-map
+;; 	      (kbd "TAB")
+;; 	      #'company-complete-common-or-cycle)
+;;   (define-key company-active-map
+;; 	      (kbd "<backtab>")
+;; 	      (lambda ()
+;;                 (interactive)
+;;                 (company-complete-common-or-cycle -1))))
+
+(use-package helm-company
+  :ensure t
+  :config
+  (define-key sly-mrepl-mode-map (kbd "<tab>") 'helm-company))
 
 
 (defun meow-setup ()
@@ -180,10 +203,8 @@
    '("k" . meow-prev)
    '("<escape>" . ignore))
   (meow-leader-define-key
-   ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
    '("k" . "H-k")
-   ;; Use SPC (0-9) for digit arguments.
    '("1" . meow-digit-argument)
    '("2" . meow-digit-argument)
    '("3" . meow-digit-argument)
@@ -258,44 +279,14 @@
    '("z" . meow-pop-selection)
    '("'" . repeat)
    '("<escape>" . ignore)))
+
 ;; This allows me to use meow-mode, a way of using emacs similar to Helix, it is 
 ;; Selection Action Paradigm modal interaction system.
 (use-package meow
-  :ensure
+  :ensure t
   :config
   (meow-setup)
   (meow-global-mode 1))
 
 (use-package cmake-mode)
-
-;; Custom-set variables and faces
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(ayu-dark))
- '(custom-safe-themes
-   '("3325e2c49c8cc81a8cc94b0d57f1975e6562858db5de840b03338529c64f58d1"
-     default))
- '(ispell-dictionary nil)
- '(package-selected-packages
-   '(ayu-theme catppuccin-theme cmake-mode company dap-mode dashboard
-	       flycheck helm-lsp lsp-ivy lsp-ui meow sly smart-comment
-	       smartparens swiper treemacs-evil treemacs-icons-dired
-	       treemacs-magit treemacs-projectile use-package vterm
-	       which-key which-key-posframe)))
-
-;; (custom-set-faces
-;; custom-set-faces was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
-;; )
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 

@@ -3,7 +3,7 @@
 ;; Just some simple function that are similar to helix!
 (defvar config-file (expand-file-name "~/.emacs.d/init.el"))
 (defun open-config ()
-  "This function opens the init file to begin editing"
+  "This function opens the init file to begin editing."
   (interactive)
   (find-file config-file))
 
@@ -13,7 +13,7 @@
 ;; On the right hand side with the commands that are available next
 ;; and I really want a format command, or format on save.
 (defun reload-config ()
-  "This function reloads emacs with the current config"
+  "This function reloads Emacs with the current config."
   (interactive)
   (load-file config-file))
 
@@ -34,10 +34,6 @@
 					; (if (has-prefix? string) (prepend string url)
 					; (url)))
 
-
-
-;; TODO: only show when scrolling, show for now. Causes errors.
-					(setq scroll-bar-mode -1)
 
 					; (defun dio-enable-scroll-mode (&rest _args)
 					;   "Set the `dio-scrolling` variable to t"
@@ -70,41 +66,49 @@
 ;; Disable menu bar, scroll bar, and tool bar at startup
 (menu-bar-mode -1)
 
-;; removethe tool bar
+;; remove the tool bar
 (tool-bar-mode -1)
 ;; I would love to get relative line numbers in emacs
 
 ;; Inhibit startup message
 (setq inhibit-startup-message t)
 
+;; Enable visual bell instead of sound
+(setq visible-bell t)
+
+;; remove scroll bars
+(set-scroll-bar-mode nil)
+
 ;; Set initial buffer choice to 'dired' or 'helix', does not seem to work.
-; (setq initial-buffer-choice 'dired) ;; Change 'dired' to your preferred mode
+					; (setq initial-buffer-choice 'dired) ;; Change 'dired' to your preferred mode
 
 ;; Set the fixed pitch face, this is something I will figure out later
 ;; We got this setting from systemcrafter: emacs from scratch
 ;; It seems that this will likely not work with emacs 27.1 which is currently comes
-; with Ubuntu/Pop-os. Will upgrade to Emacs 29.* now.
-; (set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
+					; with Ubuntu/Pop-os. Will upgrade to Emacs 29.* now.
+					; (set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(ayu-dark))
- '(custom-safe-themes
-   '("3325e2c49c8cc81a8cc94b0d57f1975e6562858db5de840b03338529c64f58d1"
-     default))
- '(ispell-dictionary nil)
- '(package-selected-packages
-   '(ayu-theme catppuccin-theme cmake-mode company dap-mode dashboard
-	       flycheck helm-lsp lsp-ivy lsp-ui meow paredit sly
-	       smart-comment smartparens swiper treemacs-evil
-	       treemacs-icons-dired treemacs-magit treemacs-projectile
-	       use-package vterm which-key which-key-posframe)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; (custom-set-variables
+;;  ;; custom-set-variables was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(custom-enabled-themes '(material-theme))
+;;  '(custom-safe-themes
+;;    '("3325e2c49c8cc81a8cc94b0d57f1975e6562858db5de840b03338529c64f58d1"
+;;      default))
+;;  '(ispell-dictionary nil)
+;;  '(package-selected-packages
+;;    '(ayu-theme catppuccin-theme cmake-mode company dap-mode dashboard
+;; 	       flycheck helm-lsp lisp-extra-font-lock lsp-ivy lsp-ui
+;; 	       meow sly smart-comment smartparens swiper treemacs-evil
+;; 	       treemacs-icons-dired treemacs-magit treemacs-projectile
+;; 	       use-package vterm which-key which-key-posframe))
+;;  '(warning-suppress-log-types '((use-package) (lsp-mode) (lsp-mode)))
+;;  '(warning-suppress-types '((lsp-mode) (lsp-mode) (lsp-mode) (lsp-mode))))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  )
