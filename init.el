@@ -28,11 +28,22 @@
   (add-hook 'elpaca-after-init-hook #'dashboard-initialize)
   (dashboard-setup-startup-hook))
 
+;; let's make lambda look pretty!
+(defun my/lisp-setup ()
+  (setq prettify-symbols-alist '(("lambda" . 955))) ; greek lambda
+  (prettify-symbols-mode 1)
+  (setq current-fill-column 100)
+  (electric-pair-local-mode 1)
+(auto-fill-mode))
+(add-hook 'lisp-mode-hook 'my/lisp-setup)
+(add-hook 'elisp-mode-hook 'my/lisp-setup)
+
 ;; Automatic code formatting
 (use-package apheleia
   :ensure t
+  :commands (alpheleia-global-mode +1)
   :config
-  (apheleia-global-mode 1)
+  ;; (apheleia-global-mode)
   ;; Setup auto formatting for purescript
   (push '(purs-tidy "purs-tidy" "format") apheleia-formatters)
   (setf (alist-get 'purescript-mode apheleia-mode-alist) '(purs-tidy))
@@ -66,29 +77,93 @@
 (use-package spinner :ensure t)
 
 ;; LSP Mode
-;; (use-package lsp-mode
-;;   :commands lsp
-;;   :hook (prog-mode . lsp)
-;;   :custom
-;;   (lsp-keymap-prefix "s-l")
-;;   :config
-;;   (use-package lsp-ui :commands lsp-ui-mode)
-;;   (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-;;   (use-package lsp-treemacs
-;;     :config
-;;     (lsp-treemacs-sync-mode 1)))
+(use-package lsp-mode
+  :commands lsp
+  ;; We want to hook on language that have an lsp, langauge like lisp should not be included.
+  ;; They seem mess up the syntax highlighting for some reason. Perhaps exception list on hooks would cool to have.
+  ;; You might be able to have a this work via remove-hook or advice :after
+  ;; :hook (prog-mode . lsp)
+  :hook (go-mode python-mode rust-mode)
+  :custom
+  (lsp-keymap-prefix "s-l")
+  :config
+  (use-package lsp-ui :commands lsp-ui-mode)
+  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+  (use-package lsp-treemacs
+    :config
+    (lsp-treemacs-sync-mode 1)))
 
 ;; Company Mode
 (use-package company
   :ensure t
   :init (global-company-mode))
 
-;; Flycheck
-(use-package flycheck
+(use-package doom-modeline
   :ensure t
-  :init (global-flycheck-mode))
+  :init (doom-modeline-mode 1))
 
-;; DAP Mode
+;; Flycheck
+(use-package flycheck :ensure t
+  :ensure t
+  :commands (flycheck-mode)
+  :config ;; Add the new checker to flycheck
+  ;; Define the Common Lisp checker using SLY
+  (defun my-flycheck-sly-start (checker callback)
+    "Start a Flycheck syntax check with SLY."
+    (let ((buffer (current-buffer)))
+      (sly-compile-and-load-file
+       (buffer-file-name)
+       (lambda (result)
+         (with-current-buffer buffer
+           (funcall callback 'finished
+                    (mapcar (lambda (msg)
+                              (flycheck-error-new-at
+                               (sly-note.line msg)
+                               (sly-note.column msg)
+                               (pcase (sly-note.severity msg)
+                                 (`:error 'error)
+                                 (`:warning 'warning)
+                                 (`:note 'info))
+                               (sly-note.message msg)
+                               :checker checker
+                               :buffer buffer
+                               :filename (buffer-file-name)))
+                            result)))))))
+
+  (flycheck-define-generic-checker 'common-lisp-sly
+    "A Common Lisp syntax checker using SLY."
+    :start #'my-flycheck-sly-start
+    :modes '(lisp-mode sly-mrepl-mode))
+  
+  (add-to-list 'flycheck-checkers 'common-lisp-sly)
+  ;; Optional: Set common-lisp-sly as the default checker for lisp-mode
+  (add-hook 'lisp-mode-hook
+	    (lambda ()
+	      (flycheck-select-checker 'common-lisp-sly)))
+  )
+
+;; EXPERIMENTAL
+;; Adapted script from Github, made to use sly instead of slime 
+;; (defun flymake-cl-backend (report-fn &rest \_args)
+;;   ;; (slime-compile-region (point-min) (point-max))
+;;   (let ((start (point-min))
+;; 	(end (point-max)))
+;;     (sly-connection)
+;;     ;; (sly-flash-region start end)
+;;     (run-hook-with-args 'sly-before-compile-functions start end)
+;;     (let ((sly-compilation-finished-hook 'sly-maybe-show-compilation-log))
+;;       (sly-compile-string (buffer-substring-no-properties start end) start))))
+
+;; ;;;###autoload
+;; (defun flymake-cl-setup (&optional enabled-checkers)
+;;   "Setup Flymake for Cl."
+;;   (interactive)
+;;   (add-hook 'flymake-diagnostic-functions
+;; 	    'flymake-cl-backend
+;; 	    nil t))
+
+
+;; ;; DAP Mode
 ;; (use-package dap-mode
 ;;   :commands dap-debug
 ;;   :config
@@ -127,6 +202,8 @@
   :ensure t
   :commands vterm)
 
+;; far, its like ummm par which is like fmt but for emacs
+
 ;; ;; Fontaine
 ;; (use-package fontaine
 ;;   :ensure t
@@ -147,6 +224,7 @@
 ;; The hooks do not seem to be doing much of anything will have to figure that out later
 (use-package sly
   :ensure t
+  :commands (sly sly-connect)
   :hook ((lisp-mode . sly-mode))
   :config
   (setq sly-lisp-implementations
@@ -165,8 +243,7 @@
 ;; Enable Rainbow Delimiters for color-coding nested parentheses
 (use-package rainbow-delimiters
   :ensure t
-  :hook ((lisp-mode . rainbow-delimiters-mode)
-	 (emacs-lisp-mode . rainbow-delimiters-mode))
+  :hook (lisp-mode emacs-lisp-mode)
   :config
   (set-face-foreground 'rainbow-delimiters-depth-1-face "#c66")
   (set-face-foreground 'rainbow-delimiters-depth-2-face "#6c6")
@@ -192,15 +269,16 @@
 
 (use-package helm-company
   :ensure t
-  :config
-  (define-key sly-mrepl-mode-map (kbd "<tab>") 'helm-company))
-
+  ;; :config
+  ;;(define-key sly-mrepl-mode-map (kbd "<tab>") 'helm-company))
+  )
 
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
    '("k" . meow-prev)
+   '(":" . meow-M-x)
    '("<escape>" . ignore))
   (meow-leader-define-key
    '("j" . "H-j")
@@ -216,7 +294,10 @@
    '("9" . meow-digit-argument)
    '("0" . meow-digit-argument)
    '("/" . meow-keypad-describe-key)
-   '("?" . meow-cheatsheet))
+   '("?" . meow-cheatsheet)
+   '("s" . meow-clipboard-yank)
+   '("y" . meow-clipboard-save)
+   )
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)
