@@ -1,8 +1,7 @@
-;;;package --- Summary
-;;;Commentary:
-;;;lexical-binding
-;;;Load custom file
-;;;Code:
+;;; package --- Summary
+;;; Commentary:
+;;; Load custom file
+;;; Code:
 (setq custom-file (locate-user-emacs-file "custom.el"))
 
 ;; Load other configuration files
@@ -40,6 +39,8 @@
         (toml "https://github.com/tree-sitter/tree-sitter-toml")
         (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+	(odin "https://github.com/ap29600/tree-sitter-odin")
+	;; This probably won't work some extra work needs to be done. Possiblely using the newer version as well which has build problems 
         (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
 ;; Dashboard for emacs
@@ -272,18 +273,18 @@
   (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
   )
 ;; Treemacs
-;; (use-package treemacs :ensure t
-;;   :commands treemacs
-;;   :functions (treemacs-follow-mode treemacs-filewatch-mode)
-;;   :config
-;;   ;; (use-package treemacs-evil) ;; is there a meow equivalent?
-;;   (use-package treemacs-projectile)
-;;   (use-package treemacs-magit)
-;;   (use-package treemacs-icons-dired)
-;;   (treemacs-follow-mode 1)
-;;   (treemacs-filewatch-mode 1))
+(use-package treemacs :ensure t
+  :commands treemacs
+  :functions (treemacs-follow-mode treemacs-filewatch-mode)
+  :config
+  (use-package treemacs-evil) ;; is there a meow equivalent?
+  (use-package treemacs-projectile)
+  (use-package treemacs-magit)
+  (use-package treemacs-icons-dired)
+  (treemacs-follow-mode 1)
+  (treemacs-filewatch-mode 1))
 
-;;; Jump around the window and buffer
+;; Jump around the window and buffer
 (use-package avy :ensure t)
 (use-package ace-window :ensure t
   :custom
@@ -331,10 +332,23 @@
     "Major mode for editing GitHub Flavored Markdown files" t)
   (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode)))
 ;;; Programming language specific stuff
+(use-package go-mode :ensure t
+  :mode ("\\.go\\'" . go-mode)
+  :config
+  (use-package go-playground :ensure t)
+  )
+
+(use-package odin-mode
+  :ensure (:host github :repo "MrJCraft/odin-mode"))
 ;; Fish is my default shell
-(use-package fish-mode :ensure t 
+(use-package fish-mode :ensure t
   :mode  ( "\\.fish\\'" . fish-mode)
-  :interpreter "fish")
+  :interpreter "fish"
+  ;; I want to figure out how to automatically 
+  :after prism
+  :config
+  (remove-hook 'prism-mode-hook 'fish-mode)
+  (prism-mode -1))
 ;;; Doing nix stuff
 (use-package nix-mode :ensure t
   :mode ("\\.nix\\'" . nix-mode))
@@ -368,7 +382,7 @@
   (define-key haskell-mode-map (kbd "C-c , T") #'haskell-doc-show-type)
   (define-key haskell-mode-map (kbd "C-c , t") #'haskell-mode-show-type-at))
 ;;; I will need to edit them at some point.
-(use-package bash 
+(use-package bash
   :mode  ( "\\.bash\\'" . bash-mode)
   :interpreter "bash")
 
@@ -431,7 +445,6 @@
   (setq inferior-lisp-program "/usr/bin/sbcl")
   (require 'sly-autoloads)
   
-
   ;; (setq sly-enable-evaluate-in-emacs t)
   ;; This is to prepare for allowing sending values to emacs so that I can then call slynk, alternatively I would just send an interactive form, or wrap a regular emacs function that i send to slynk?
   ;; This last option seems to make more sense, i get the values from emacs, run save-sly-and-die with the arguments that I get from emacs. This way I can call compile file and it would just run this stuff, maybe even create a sbcl script?
@@ -493,17 +506,16 @@
   ;; They seem mess up the syntax highlighting for some reason. Perhaps exception list on hooks would cool to have.
   ;; You might be able to have a this work via remove-hook or advice :after
   ;; :hook (prog-mode . lsp)
-  :hook ((go-mode python-mode rust-mode fish-mode bash-mode fish-mode) . lsp)
-  ;;  :custom
-  ;;  (lsp-keymap-prefix "s-l")
+  :hook ((go-mode python-mode rust-mode bash-mode fish-mode) . lsp)
+  :custom
+  (lsp-keymap-prefix "C-c C-a")
   :config
-  ;; (use-package lsp-ui :commands lsp-ui-mode)
+  (use-package lsp-ui :ensure t :commands lsp-ui-mode)
   ;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
   ;; (use-package lsp-treemacs :ensure t
   ;;   :config (lsp-treemacs-sync-mode 1))
   ;;
   (add-to-list 'lsp-language-id-configuration '(fish-mode . "fish"))
-
   )
 
 ;;; Some completion oriented stuff is below
@@ -645,6 +657,8 @@
 	  org-agenda-mode-hook
 	  pdf-outline-buffer-mode-hook
 	  proced-mode-hook
+	  emacs-lisp-mode-hook
+	  lisp-mode-hook
 	  tabulated-list-mode-hook))
   (add-to-list 'load-path "~/.emacs.d/manual-packages/lin")
   )

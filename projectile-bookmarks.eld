@@ -1,1 +1,1 @@
-("~/quicklisp/")
+("~/.emacs.d/" "~/" "~/Programs/resume/")
