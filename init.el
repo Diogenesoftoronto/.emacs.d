@@ -26,7 +26,7 @@
 (setq treesit-language-source-alist
       '((bash "https://github.com/tree-sitter/tree-sitter-bash")
         (cmake "https://github.com/uyha/tree-sitter-cmake")
-	(fish "https://github.com/ram02z/tree-sitter-fish")
+				(fish "https://github.com/ram02z/tree-sitter-fish")
         (css "https://github.com/tree-sitter/tree-sitter-css")
         (elisp "https://github.com/Wilfred/tree-sitter-elisp")
         (go "https://github.com/tree-sitter/tree-sitter-go")
@@ -39,8 +39,8 @@
         (toml "https://github.com/tree-sitter/tree-sitter-toml")
         (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-	(odin "https://github.com/ap29600/tree-sitter-odin")
-	;; This probably won't work some extra work needs to be done. Possiblely using the newer version as well which has build problems 
+				(odin "https://github.com/ap29600/tree-sitter-odin")
+				;; This probably won't work some extra work needs to be done. Possiblely using the newer version as well which has build problems
         (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
 ;; Dashboard for emacs
@@ -49,9 +49,9 @@
   :config (dashboard-setup-startup-hook)
   :init
   (add-hook 'elpaca-after-init-hook
-	    #'dashboard-insert-startupify-lists
-	    (add-hook
-	     'elpaca-after-init-hook #'dashboard-initialize))
+						#'dashboard-insert-startupify-lists
+						(add-hook
+						 'elpaca-after-init-hook #'dashboard-initialize))
   )
 
 ;; Automatic code formatting
@@ -61,8 +61,8 @@
   (require 'apheleia-formatters)
   :hook (prog-mode))
 
-(use-package prism :ensure t
-  :hook (prog-mode))
+;; (use-package prism :ensure t
+;;   :hook (prog-mode))
 ;; I used rainbow delimiters before but I am going to try using prism,
 ;; it seems genuinely interesting.
 ;; Display hex colors in emacs
@@ -117,19 +117,18 @@
 ;; I want to move values up and around other stuff.
 (use-package drag-stuff :ensure t
   :hook ((prog-mode . drag-stuff-mode)
-	 (org-mode . drag-stuff-mode)
-	 (text-mode . drag-stuff-mode))
+				 (org-mode . drag-stuff-mode)
+				 (text-mode . drag-stuff-mode))
   ;; :bind ("C-k" ("Drag this line up: " . drag-stuff-up)
   ;; 	 "C-j" ("Drag this line down: " . drag-stuff-down))
-  :bind-keymap
-  ("C-c C-d" . drag-stuff-mode-map)
+  ;; :bind-keymap
+  ;; ("C-c `" . drag-stuff-mode-map)
   ;; :bind
   ;; (:map drag-stuff-mode-map ("C-j" drag-stuff-up) ("C-k" drag-stuff-down))
   ;; (:repeat-map drag-stuff-repeat-map ("j" drag-stuff-up))
   )
-
 ;; (use-package pulsar
-;;   ;; Highlight cursor position after movement
+;;   
 ;;   :defer t
 ;;   :init
 ;;   (defun pulse-line (&rest _)
@@ -150,7 +149,7 @@
 (use-package flycheck
   :ensure t
   :commands (flycheck-mode)
-  :hook (emacs-lisp-mode lisp-mode)
+  :hook (emacs-lisp-mode go-mode fish-mode lisp-mode)
   ;; :config
   ;; Add the new checker to flycheck
   ;; Define the Common Lisp checker using SLY
@@ -326,7 +325,7 @@
   (autoload 'markdown-mode "markdown-mode"
     "Major mode for editing Markdown files" t)
   (add-to-list 'auto-mode-alist
-	       '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . markdown-mode))
+							 '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . markdown-mode))
 
   (autoload 'gfm-mode "markdown-mode"
     "Major mode for editing GitHub Flavored Markdown files" t)
@@ -335,8 +334,7 @@
 (use-package go-mode :ensure t
   :mode ("\\.go\\'" . go-mode)
   :config
-  (use-package go-playground :ensure t)
-  )
+  (use-package go-playground :ensure t))
 
 (use-package odin-mode
   :ensure (:host github :repo "MrJCraft/odin-mode"))
@@ -344,11 +342,12 @@
 (use-package fish-mode :ensure t
   :mode  ( "\\.fish\\'" . fish-mode)
   :interpreter "fish"
-  ;; I want to figure out how to automatically 
-  :after prism
-  :config
-  (remove-hook 'prism-mode-hook 'fish-mode)
-  (prism-mode -1))
+  ;; I want to figure out how to automatically
+  ;; :after prism
+  ;; :config
+  ;; (remove-hook 'prism-mode-hook 'fish-mode)
+  ;; (prism-mode -1)
+	)
 ;;; Doing nix stuff
 (use-package nix-mode :ensure t
   :mode ("\\.nix\\'" . nix-mode))
@@ -381,6 +380,99 @@
   (define-key haskell-mode-map (kbd "C-c , l") #'haskell-interactive-mode-clear)
   (define-key haskell-mode-map (kbd "C-c , T") #'haskell-doc-show-type)
   (define-key haskell-mode-map (kbd "C-c , t") #'haskell-mode-show-type-at))
+
+(setq spook--indent-width 2)
+(setq-default tab-width spook--indent-width)
+
+(defun spook--nvm-p ()
+  (when-let* ((node (string-trim (shell-command-to-string "fish -c 'readlink (which node)'")))
+              (nvm-bin-dir
+               (and (string-match-p "\/nvm\/" node)
+                    (file-name-directory node))))
+    nvm-bin-dir))
+(setq css-indent-offset spook--indent-width)
+
+;; (use-package js-ts
+;;   :mode "\\.js'"
+;;   :ensure nil
+;;   :config
+;;   (setq js-indent-level spook--indent-width)
+;;   :hook
+;;   (((js-ts-mode
+;;      typescript-ts-mode) . subword-mode)))
+
+(use-package web-mode
+  :mode (("\\.html?\\'" . web-mode))
+	:ensure t
+  :config
+  (setq web-mode-markup-indent-offset spook--indent-width)
+  (setq web-mode-code-indent-offset spook--indent-width)
+  (setq web-mode-css-indent-offset spook--indent-width)
+  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))))
+
+(use-package emmet-mode
+	:ensure t
+  :hook ((html-mode           . emmet-mode)
+         (css-mode            . emmet-mode)
+         (js-ts-mode          . emmet-mode)
+         (js-jsx-mode         . emmet-mode)
+         (typescript-ts-mode  . emmet-mode)
+         (tsx-ts-mode         . emmet-mode)
+         (web-mode            . emmet-mode))
+  :config
+  (setq emmet-insert-flash-time 0.001)	; effectively disabling it
+  (add-hook 'js-jsx-mode-hook #'(lambda ()
+                                  (setq-local emmet-expand-jsx-className? t)))   
+  (add-hook 'web-mode-hook #'(lambda ()
+                               (setq-local emmet-expand-jsx-className? t))))
+
+;; (spook--defkeymap
+;;  "spook-errors" "C-c e"
+;;  '("n" . flycheck-next-error)
+;;  '("p" . flycheck-previous-error)
+;;  '("l" . flycheck-list-errors)
+;;  '("e" . flycheck-explain-error-at-point))
+
+(defun spook--setup-ts-js ()
+  "Setup Javascript and Typescript for current buffer."
+  ;; Add node_modules/.bin of current project to exec-path.
+  (if-let (nvm-bin (spook--nvm-p))
+      (add-to-list 'exec-path nvm-bin)
+    (let ((bin-dir
+           (expand-file-name
+            "node_modules/.bin/"
+            (locate-dominating-file default-directory "node_modules"))))
+      (when (file-exists-p bin-dir)
+        (add-to-list 'exec-path bin-dir))))
+
+  ;; For 95% of cases this is what I want
+  (prettier-format-on-save-mode +1)
+  
+  (setf flymake-eslint-project-root
+        (locate-dominating-file default-directory "package.json")))
+
+(add-hook 'js-ts-mode-hook #'spook--setup-ts-js)
+
+(use-package typescript-ts-mode
+  :mode "\\.ts\\'"
+  :ensure nil
+  :hook ((typescript-ts-mode . subword-mode))
+  :config
+  (setq-default typescript-indent-level spook--indent-width)
+  (add-hook 'typescript-mode-hook #'spook--setup-ts-js))
+
+(use-package tsx-ts-mode
+  :mode "\\.tsx\\'"
+  :ensure nil
+  :hook ((tsx-ts-mode . subword-mode))
+  :config
+  (setq-default typescript-indent-level spook--indent-width)
+  (add-hook 'typescript-mode-hook #'spook--setup-ts-js))
+
+;; (use-package css-ts-mode
+;;   :ensure nil
+;;   :mode "\\.s?css\\'")
+
 ;;; I will need to edit them at some point.
 (use-package bash
   :mode  ( "\\.bash\\'" . bash-mode)
@@ -471,17 +563,17 @@
 
   ;; perhaps create an interactive function that sets the sly lisp implementation with a different memory size.
   (setq sly-lisp-implementations
-	'((sbcl ("sbcl" "--dynamic-space-size" "8gb")))))
+				'((sbcl ("sbcl" "--dynamic-space-size" "8gb")))))
 (cl-defmacro add-sly-contribs (&rest contribs) "A macro to add CONTRIBS to sly."
-	     `(progn
-		,@(cl-mapcar (lambda (contrib)
-			       `(use-package ,(intern (concat "sly-" (symbol-name contrib))) :ensure t
-				  :config
-				  (add-to-list 'load-path
-					       (expand-file-name
-						(concat "~/.emacs.d/elpaca/builds/sly-" (symbol-name ',contrib))))
-				  (require ',(intern (concat "sly-" (symbol-name contrib) "-autoloads")))))
-			     contribs)))
+						 `(progn
+								,@(cl-mapcar (lambda (contrib)
+															 `(use-package ,(intern (concat "sly-" (symbol-name contrib))) :ensure t
+																	:config
+																	(add-to-list 'load-path
+																							 (expand-file-name
+																								(concat "~/.emacs.d/elpaca/builds/sly-" (symbol-name ',contrib))))
+																	(require ',(intern (concat "sly-" (symbol-name contrib) "-autoloads")))))
+														 contribs)))
 (add-sly-contribs asdf quicklisp macrostep named-readtables) ;; TODO: add stepper, which seems to run into an error.
 ;; Picolisp
 ;; this documentation stuff is just broken right now and will need to be fixed later.
@@ -507,16 +599,14 @@
   ;; You might be able to have a this work via remove-hook or advice :after
   ;; :hook (prog-mode . lsp)
   :hook ((go-mode python-mode rust-mode bash-mode fish-mode) . lsp)
-  :custom
-  (lsp-keymap-prefix "C-c C-a")
   :config
-  (use-package lsp-ui :ensure t :commands lsp-ui-mode)
-  ;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-  ;; (use-package lsp-treemacs :ensure t
-  ;;   :config (lsp-treemacs-sync-mode 1))
-  ;;
+  ;; Fish mode still lacks lsp integration I should try to get this actually working at some point.
   (add-to-list 'lsp-language-id-configuration '(fish-mode . "fish"))
   )
+(use-package lsp-ui :ensure t :commands lsp-ui-mode :after lsp-mode)
+(use-package lsp-treemacs :ensure t
+  :config (lsp-treemacs-sync-mode 1)
+  :after (lsp-mode treemacs))
 
 ;;; Some completion oriented stuff is below
 ;; Company Mode
@@ -552,11 +642,11 @@
 (use-package vertico
   :ensure t
   :bind (:map vertico-map ("<tab>" . #'vertico-insert)  ; Insert selected candidate into text area
-	      ("<escape>" . #'minibuffer-keyboard-quit) ; Close minibuffer
-	      ;; NOTE 2022-02-05: Cycle through candidate groups
-	      ("C-n" . #'vertico-next)
-	      ("C-p" . #'vertico-previous)
-	      )
+							("<escape>" . #'minibuffer-keyboard-quit) ; Close minibuffer
+							;; NOTE 2022-02-05: Cycle through candidate groups
+							("C-n" . #'vertico-next)
+							("C-p" . #'vertico-previous)
+							)
   :config
   (vertico-mode))
 
@@ -640,32 +730,32 @@
   :config
   (customize-set-variable 'lin-face 'lin-cyan)
   (setq lin-mode-hooks
-	'(bongo-mode-hook
-	  dired-mode-hook
-	  elfeed-search-mode-hook
-	  git-rebase-mode-hook
-	  grep-mode-hook
-	  ibuffer-mode-hook
-	  ilist-mode-hook
-	  ledger-report-mode-hook
-	  log-view-mode-hook
-	  magit-log-mode-hook
-	  mu4e-headers-mode-hook
-	  notmuch-search-mode-hook
-	  notmuch-tree-mode-hook
-	  occur-mode-hook
-	  org-agenda-mode-hook
-	  pdf-outline-buffer-mode-hook
-	  proced-mode-hook
-	  emacs-lisp-mode-hook
-	  lisp-mode-hook
-	  tabulated-list-mode-hook))
+				'(bongo-mode-hook
+					dired-mode-hook
+					elfeed-search-mode-hook
+					git-rebase-mode-hook
+					grep-mode-hook
+					ibuffer-mode-hook
+					ilist-mode-hook
+					ledger-report-mode-hook
+					log-view-mode-hook
+					magit-log-mode-hook
+					mu4e-headers-mode-hook
+					notmuch-search-mode-hook
+					notmuch-tree-mode-hook
+					occur-mode-hook
+					org-agenda-mode-hook
+					pdf-outline-buffer-mode-hook
+					proced-mode-hook
+					emacs-lisp-mode-hook
+					lisp-mode-hook
+					tabulated-list-mode-hook))
   (add-to-list 'load-path "~/.emacs.d/manual-packages/lin")
   )
 
 (use-package marginalia :ensure t
   :bind (:map minibuffer-local-map
-	      ("M-A" . marginalia-cycle))
+							("M-A" . marginalia-cycle))
   ;; The :init configuration is always executed (Not lazy!)
   :init
   ;; Must be in the :init section of use-package such that the mode gets
@@ -686,7 +776,7 @@
 (use-package dabbrev
   ;; Swap M-/ and C-M-/
   :bind (("M-/" . dabbrev-completion)
-	 ("C-M-/" . dabbrev-expand))
+				 ("C-M-/" . dabbrev-expand))
   :config
   (add-to-list 'dabbrev-ignored-buffer-regexps "\\'` ")
   ;; Since 29.1, use `dabbrev-ignored-buffer-regexps' on older.
@@ -772,7 +862,7 @@
   ;;    "meow state for interacting with symex"
   ;;    :lighter " [P]"
   ;;    :keymap symex-mode-interface)
-
+  
   ;; meow-define-state creates the variable
   ;; (setq meow-cursor-type-paren 'hollow)
   ;; (meow-setup-keys 'paren
@@ -796,7 +886,7 @@
    '("T" . eat-other-window)
    ;; this should maybe change to switch to
    ;; the eat buffer if is available.
-   '(":" . meow-M-x) ;; makes it more like helix
+   '(":" . lsp-keymap-prefix) ;; makes it more like helix
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)
    '("8" . meow-expand-8)
@@ -824,7 +914,7 @@
    '("E" . meow-next-symbol)
    '("f" . meow-find)
    '("g" . meow-cancel-selection)
-   '("G" . ace-window)
+   '("G" . consult-buffer)
    '("h" . meow-left)
    '("H" . meow-left-expand)
    '("i" . meow-insert)
@@ -860,6 +950,7 @@
    '("Y" . meow-sync-grab)
    '("z" . meow-pop-selection)
    '("'" . repeat)
+   '("C-." . ace-window)
    '("<escape>" . ignore)))
 
 ;; MMMEOW the best modal editor around with custom additions nya~

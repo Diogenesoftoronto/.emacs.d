@@ -1,4 +1,5 @@
 ;;; -*- lisp-data -*-
-(("/home/keithnoel/.config/fish/") ("/home/keithnoel/.emacs.d/")
- ("/home/keithnoel/Documents/")
+(("/home/keithnoel/Programs/epicor-migration-harness/")
+ ("/home/keithnoel/Documents/") ("/home/keithnoel/.emacs.d/")
+ ("/home/keithnoel/.config/fish/")
  ("/home/keithnoel/quicklisp/local-projects/cyber-daemon-clash/"))
