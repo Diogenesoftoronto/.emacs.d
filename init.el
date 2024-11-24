@@ -477,7 +477,7 @@
 (use-package bash
   :mode  ( "\\.bash\\'" . bash-mode)
   :interpreter "bash")
-
+(use-package pyvenv :ensure t)
 ;; (use-package yasnippet :ensure t
 ;;   :hook (prog-mode org-mode))
 ;; (use-package yasnippet-snippets
@@ -516,6 +516,10 @@
   :hook (html-mode)
   :config (tagedit-add-paredit-like-keybindings))
 ;;;Some lisp stuff
+;; racket stuff
+(use-package racket-mode :ensure t
+	:mode ("\\.rkt\\'" . racket-mode))
+
 ;; (use-package parinfer-rust-mode :ensure t
 ;;   :hook (emacs-lisp-mode
 ;; 	 ;; clojure-mode
@@ -523,20 +527,20 @@
 ;; 	 ;; racket-mode
 ;; 	 ;; lisp-mode
 ;; 	 ))
+
 ;; Both of these require the recipe like formula used for ready-player-one
-(use-package evil :ensure t)
-(use-package symex :ensure t :config (symex-initialize))
-(use-package buffer-ring :ensure (:host github :repo "countvajhula/buffer-ring"))
-(use-package transpose-frame :ensure (:host github :repo "emacsorphanage/transpose-frame" :version (lambda (_) ".2.0")))
-(use-package rigpa :ensure (:host github :repo "countvajhula/rigpa")
-  :after (symex evil buffer-ring))
+;; (use-package evil :ensure t)
+;; (use-package symex :ensure t :config (symex-initialize))
+;; (use-package buffer-ring :ensure (:host github :repo "countvajhula/buffer-ring"))
+;; (use-package transpose-frame :ensure (:host github :repo "emacsorphanage/transpose-frame" :version (lambda (_) ".2.0")))
+;; (use-package rigpa :ensure (:host github :repo "countvajhula/rigpa")
+;;   :after (symex evil buffer-ring))
 ;; Use sly for Common Lisp interaction
 ;; The hooks do not seem to be doing much of anything will have to figure that out later
 (use-package sly :ensure t
   :config
   (setq inferior-lisp-program "/usr/bin/sbcl")
   (require 'sly-autoloads)
-  
   ;; (setq sly-enable-evaluate-in-emacs t)
   ;; This is to prepare for allowing sending values to emacs so that I can then call slynk, alternatively I would just send an interactive form, or wrap a regular emacs function that i send to slynk?
   ;; This last option seems to make more sense, i get the values from emacs, run save-sly-and-die with the arguments that I get from emacs. This way I can call compile file and it would just run this stuff, maybe even create a sbcl script?
