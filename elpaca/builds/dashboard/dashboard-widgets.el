@@ -1,1 +1,1 @@
-/home/keithnoel/.emacs.d/elpaca/repos/emacs-dashboard/dashboard-widgets.el
+/home/diogenes/.emacs.d/elpaca/repos/emacs-dashboard/dashboard-widgets.el

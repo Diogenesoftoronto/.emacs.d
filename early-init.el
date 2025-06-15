@@ -41,7 +41,9 @@
   (unless (require 'elpaca-autoloads nil t)
     (require 'elpaca)
     (elpaca-generate-autoloads "elpaca" repo)
-    (load "./elpaca-autoloads")))
+    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))
+		)
+	)
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
@@ -115,7 +117,7 @@
   (projectile-mode t)
 
   ;; get rid of package.el, this may help compatibility
-  (package-enable-at-startup nil)
+  (setq package-enable-at-startup nil)
 
   :config
   ;; Backup stuff so that I no longer have to change git to ignore these.
@@ -127,7 +129,7 @@
   (setq autosave-dir (expand-file-name "tmp/auto-saves/" user-emacs-directory))
   (make-directory autosave-dir t)
   (setq auto-save-list-file-prefix (expand-file-name "sessions/" autosave-dir)
-	auto-save-file-prefix-name-transforms `(".*" ,(expand-file-name "sessions/" autosave-dir) t))
+				auto-save-file-prefix-name-transforms `(".*" ,(expand-file-name "sessions/" autosave-dir) t))
   )
 ;;; early-init.el ends here
 

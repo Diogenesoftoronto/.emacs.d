@@ -1,1 +1,1 @@
-/home/keithnoel/.emacs.d/elpaca/repos/spinner/spinner.el
+/home/diogenes/.emacs.d/elpaca/repos/spinner/spinner.el

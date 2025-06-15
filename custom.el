@@ -17,20 +17,29 @@
   (electric-pair-local-mode 1) ;; instead of pair edit, we may choose
   ;; to enable a lisp version of meow along with paredit
   (auto-fill-mode))
+
+(defun mu-quit-or-restart (&optional restart)
+  "Quit Emacs or restart it with RESTART."
+  (interactive "P")
+  (if restart
+      (restart-emacs)
+    (save-buffers-kill-terminal t)))
+(keymap-global-set "C-x C-c" #'mu-quit-or-restart)
+
 (defun dio-prog-setup () (lambda ()
-			   (setq prettify-symbols-alist
-				 '(("lambda" . ?λ)
-				   ("->"     . ?→)
-				   ("map"    . ?↦)
-				   ("/="     . ?≠)
-				   ("!="     . ?≠)
-				   ("=="     . ?≡)
-				   ("<="     . ?≤)
-				   (">="     . ?≥)
-				   ("&&"     . ?∧)
-				   ("||"     . ?∨)
-				   ("sqrt"   . ?√)
-				   ("..."    . ?…))))
+													 (setq prettify-symbols-alist
+																 '(("lambda" . ?λ)
+																	 ("->"     . ?→)
+																	 ("map"    . ?↦)
+																	 ("/="     . ?≠)
+																	 ("!="     . ?≠)
+																	 ("=="     . ?≡)
+																	 ("<="     . ?≤)
+																	 (">="     . ?≥)
+																	 ("&&"     . ?∧)
+																	 ("||"     . ?∨)
+																	 ("sqrt"   . ?√)
+																	 ("..."    . ?…))))
        (prettify-symbols-mode 1))
 (add-hook 'prog-mode-hook #'dio-prog-setup)
 ;; (add-hook 'lisp-mode-hook 'dio-lisp-setup)
@@ -67,48 +76,48 @@
   ;; You can just make this a dolist instead
   ;; (let (()))
   (cl-loop for file in (list config-file custom-file early-init-file) do
-	   (load-file file)))
+					 (load-file file)))
 
-					; (defun rotate (&key start end ele &optional direction ele-p)
-					;   "This rotates a list of ELE and outputs the changed positons in DIRECTION, without giving direction, it defaults to clockwise"
-					;   (interactive)
-					;   (if direction
-					;       (funcall (lambda (start end ele direction)
-					; 		 ())
-					; 	       start end ele direction)
-					;     (funcall (lambda (start end ele)
-					; 	       ;; by default it runs the function clockwise
-					; 	       ;; we want to loop through ele, transposing the car with the cdr until we reach a cdr that fails ele-p.
-					; 	       ;; once we do this we must then send the inner list and call the function again.
-					; 	       ;; we do this until we reach an empty set and return the final list.
-					; 	       (let ((fele (first ele))
-					; 		     (lele (last ele))
-					; 		     (retele ele)
-					; 		     (prele nil))
+																				; (defun rotate (&key start end ele &optional direction ele-p)
+																				;   "This rotates a list of ELE and outputs the changed positons in DIRECTION, without giving direction, it defaults to clockwise"
+																				;   (interactive)
+																				;   (if direction
+																				;       (funcall (lambda (start end ele direction)
+																				; 		 ())
+																				; 	       start end ele direction)
+																				;     (funcall (lambda (start end ele)
+																				; 	       ;; by default it runs the function clockwise
+																				; 	       ;; we want to loop through ele, transposing the car with the cdr until we reach a cdr that fails ele-p.
+																				; 	       ;; once we do this we must then send the inner list and call the function again.
+																				; 	       ;; we do this until we reach an empty set and return the final list.
+																				; 	       (let ((fele (first ele))
+																				; 		     (lele (last ele))
+																				; 		     (retele ele)
+																				; 		     (prele nil))
 
-					; 		 (if (ele-p lele) (setf prele lele)
-					; 		   (setf lele prele)
-					; 		   (setf fele lele)
-					; 		   )
-					; 		 start end ele)))))
+																				; 		 (if (ele-p lele) (setf prele lele)
+																				; 		   (setf lele prele)
+																				; 		   (setf fele lele)
+																				; 		   )
+																				; 		 start end ele)))))
 
-					; (defun rotate-chars (chars &optional direction)
-					;   "This rotates a list of ELE and outputs the changed positons in DIRECTION, without giving direction, it defaults to clockwise"
-					;   (interactive)
-					;   (if direction
-					;       ((funcall (lambda (direction)
-					; 		  ())
-					; 		start end ele direction)
-					;        (let  ((rotating (lambda (chars)
-					; 			  (
-					; 			   (let* ((first-char (car chars)
-					; 					      (lars chars)
-					; 					      (last-char (while (cdr lars)
-					; 							   (setf lars (cdr chars))))))
-					; 			     (setf chars (transpose-chars first-char last-char))
-					; 			     (while chars (rotating chars)))))))
-					; 	 (rotating chars)))
-					;     ))
+																				; (defun rotate-chars (chars &optional direction)
+																				;   "This rotates a list of ELE and outputs the changed positons in DIRECTION, without giving direction, it defaults to clockwise"
+																				;   (interactive)
+																				;   (if direction
+																				;       ((funcall (lambda (direction)
+																				; 		  ())
+																				; 		start end ele direction)
+																				;        (let  ((rotating (lambda (chars)
+																				; 			  (
+																				; 			   (let* ((first-char (car chars)
+																				; 					      (lars chars)
+																				; 					      (last-char (while (cdr lars)
+																				; 							   (setf lars (cdr chars))))))
+																				; 			     (setf chars (transpose-chars first-char last-char))
+																				; 			     (while chars (rotating chars)))))))
+																				; 	 (rotating chars)))
+																				;     ))
 
 ;; Let us make urls a bit nicer to deal with, lets wrap the browse command
 ;; with https if it is not in the url, otherwise we will just use browse
@@ -159,14 +168,14 @@
       (progn
         (display-line-numbers-mode 1)
         (setq display-line-numbers 'visual)  ;; Set to visual line numbers
-	(setq display-line-numbers-current-absolute t))
+				(setq display-line-numbers-current-absolute t))
     (progn (setq display-numbers-current-absolute t) (display-line-numbers-mode -1))))  ;; Disable line numbers
 
 (defun enable-mixed-line-numbers-mode ()
   "Enable mixed-line-numbers-mode."
   (mapcar (lambda (x) (when (derived-mode-p x)
-			(mixed-line-numbers-mode 1)))
-	  '(org-mode prog-mode)))  ;; Optionally limit to
+												(mixed-line-numbers-mode 1)))
+					'(org-mode prog-mode)))  ;; Optionally limit to
 ;; programming modes and org-mode, should add markdown mode in the
 ;; future
 
@@ -181,7 +190,7 @@
   (walk-windows (lambda (w)
                   (unless (eq w (selected-window))
                     (with-current-buffer (window-buffer w)
-		      (disable-mixed-line-numbers-mode)))))
+											(disable-mixed-line-numbers-mode)))))
   (enable-mixed-line-numbers-mode))
 
 ;; (defun highlight-selected-window ()
@@ -204,51 +213,51 @@
 ;; Set the fixed pitch face, this is something I will figure out later
 ;; We got this setting from systemcrafter: emacs from scratch
 ;; It seems that this will likely not work with emacs 27.1 which is currently comes
-					; with Ubuntu/Pop-os. Will upgrade to Emacs 29.* now.
-					; (set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
+																				; with Ubuntu/Pop-os. Will upgrade to Emacs 29.* now.
+																				; (set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
 
 
-					; (defun dio-matched-char (char)
-					;   "Match a character."
-					;   (pcase char
-					;     (`?< ?>)
-					;     (`?( ?))
-					;     (`?[ ?])
-					;     (`?{ ?})
-					;     (_ char)))
+																				; (defun dio-matched-char (char)
+																				;   "Match a character."
+																				;   (pcase char
+																				;     (`?< ?>)
+																				;     (`?( ?))
+																				;     (`?[ ?])
+																				;     (`?{ ?})
+																				;     (_ char)))
 
-					; (defun dio-surround-region-with-character (char)
-					;   "Surrounds a region with char"
-					;   (let ((start (region-beginning))
-					;         (end (region-end)))
-					;     (save-excursion
-					;       (goto-char end)
-					;       (insert (dio-matched-char char))
-					;       (goto-char start)
-					;       (insert char))))
+																				; (defun dio-surround-region-with-character (char)
+																				;   "Surrounds a region with char"
+																				;   (let ((start (region-beginning))
+																				;         (end (region-end)))
+																				;     (save-excursion
+																				;       (goto-char end)
+																				;       (insert (dio-matched-char char))
+																				;       (goto-char start)
+																				;       (insert char))))
 
-					; (defun dio-surround-region-with-character-inter (char)
-					;   "Surround region with CHAR and its matching counterpart."
-					;   (interactive "cEnter character: ")
-					;   (dio-surround-region-with-character char))
+																				; (defun dio-surround-region-with-character-inter (char)
+																				;   "Surround region with CHAR and its matching counterpart."
+																				;   (interactive "cEnter character: ")
+																				;   (dio-surround-region-with-character char))
 ;; ;; Example usage:
 ;; ;; Select a region in the buffer and call the function, e.g.,
 ;; ;; (surround-region-with-character ?<)
 ;; ;; (define-prefix-command exterm exterm-mode-map "manipulate vterm from other-window")
 
-					; (defvar-keymap exterm
-					;   "C-v" #'vterm-other-window
-					;   "v" #'vterm
-					;   "C-p" (lambda () (progn (vterm-other-window)
-					; 			  (meow-yank)
-					; 			  (vterm-insert)))
-					;   "p" (lambda () (progn (vterm-otherv-window)
-					; 			(meow-clipboard-yank)
-					; 			(vterm-insert))))
+																				; (defvar-keymap exterm
+																				;   "C-v" #'vterm-other-window
+																				;   "v" #'vterm
+																				;   "C-p" (lambda () (progn (vterm-other-window)
+																				; 			  (meow-yank)
+																				; 			  (vterm-insert)))
+																				;   "p" (lambda () (progn (vterm-otherv-window)
+																				; 			(meow-clipboard-yank)
+																				; 			(vterm-insert))))
 
-					; (bind-key "C-h C-f" #'describe-function)
-					; (bind-key "C-h C-m" #'describe-mode)
-					; (bind-key "C-o" #'switch-to-buffer)
+																				; (bind-key "C-h C-f" #'describe-function)
+																				; (bind-key "C-h C-m" #'describe-mode)
+																				; (bind-key "C-o" #'switch-to-buffer)
 ;; This allows me to use meow-mode, a way of using emacs similar to Helix, it is
 ;; Selection Action Paradigm modal interaction system.
 

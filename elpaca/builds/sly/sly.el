@@ -1,1 +1,1 @@
-/home/keithnoel/.emacs.d/elpaca/repos/sly/sly.el
+/home/diogenes/.emacs.d/elpaca/repos/sly/sly.el

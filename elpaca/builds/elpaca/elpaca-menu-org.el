@@ -1,1 +1,1 @@
-/home/keithnoel/.emacs.d/elpaca/repos/elpaca/elpaca-menu-org.el
+/home/diogenes/.emacs.d/elpaca/repos/elpaca/elpaca-menu-org.el

@@ -1,1 +1,1 @@
-/home/keithnoel/.emacs.d/elpaca/repos/spinner/README.org
+/home/diogenes/.emacs.d/elpaca/repos/spinner/README.org
